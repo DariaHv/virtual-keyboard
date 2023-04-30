@@ -23,12 +23,16 @@ class App {
         this.main.addEventListener(
             "keydown",
             (event) => {
-              let key = this.findKey(event.code, document.getElementsByClassName("key"));
+           if(!event.repeat)
+              {let key = this.findKey(event.code, document.getElementsByClassName("key"));
               if (key!=0) {
-                key.classList.toggle("active");
+  
+               
+               key.classList.toggle("active");
               }
               else 
               console.log(key)
+            }
             },
             true
           );
@@ -36,12 +40,15 @@ class App {
     this.main.addEventListener(
             "keyup",
             (event) => {
+           if(!event.repeat)
+              {
               let key = this.findKey(event.code, document.getElementsByClassName("key"));
               if (key!=0) {
                 key.classList.toggle("active");
               }
               else 
               console.log(key)
+            }
             },
             true
           );
@@ -53,7 +60,7 @@ class App {
     
     findKey(code, keys) {
        function hasKey(value, code) {
-           const list = Array.from(value.classList);
+           const list = Array.from(value.classList); 
            for (let i=0; i<list.length; i++)
              {
               if ((list[i].replace("-",""))==(code.toLowerCase()
@@ -62,9 +69,8 @@ class App {
              }
               return false;
             }
-          
-          
           for (let i=0; i<keys.length;i++){
+            //console.log (keys[i].classList)
             if (hasKey(keys[i], code)){
             return keys[i];}
           }
@@ -82,6 +88,8 @@ class Keyboard {
         this.keysContainer.classList.add("keys");
         this.keysContainer.appendChild(this.createKeys());
         this.keys = this.keysContainer.querySelectorAll(".key");
+        this.value = "";
+        this.capsLock = false;
     }
     getKeysContainer() {
         return this.keysContainer;
@@ -122,6 +130,7 @@ class Keyboard {
 
                 case "Backspace":
                     keyElement.classList.add("backspace");
+
                     break;
 
                 case "Tab":
@@ -246,8 +255,9 @@ class Keyboard {
                     if (!isNaN(key))
                       keyElement.classList.add("digit-"+key);
                       else keyElement.classList.add("key-"+key);
+                     
 
-                    keyElement.classList.add(key);
+                    //keyElement.classList.add(key);
                 break;
             }
 
