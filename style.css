@@ -16,26 +16,29 @@
     min-width: 800px;
     margin: 0 auto;
     display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .keys{
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
   }
   .key {
     font-size: 100%;
     margin: 0.5%;
     height: 50px;
-    width: 5%;
+    width: 5.5%;
   }
   .backspace {
-    width:15%
+    width:14.5%
   }
   .tab, .del  {
-    width: 7%;
+    width: 6.7%;
   }
   .caps, .enter {
 
-    width: 13%;
+    width: 13.2%;
   }
   .ctrl {
     width: 10%;
@@ -44,6 +47,10 @@
     width: 35%;
   }
   .shift-l{
-
     width: 21%;
+  }
+  .textbox {
+    width: 100%;
+    height: 100px;
+    order: 0;
   }

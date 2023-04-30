@@ -1,3 +1,14 @@
+class Textbox {
+    constructor() {
+        this.textbox = document.createElement("textarea");
+        this.textbox.classList.add("textbox");
+    }
+
+    getTextbox() {
+        return this.textbox;
+    }
+
+}
 
 class App {
     constructor() {
@@ -5,6 +16,8 @@ class App {
         this.main.classList.add("main");
         document.body.appendChild(this.main);
         this.keyboard = new Keyboard();
+        this.textbox = new Textbox();
+        this.main.appendChild(this.textbox.getTextbox());
         this.main.appendChild(this.keyboard.getKeys());
         document.body.appendChild(this.main);
     }
