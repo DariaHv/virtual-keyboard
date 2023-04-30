@@ -1,22 +1,28 @@
 
-const Keyboard = {
-    elements: {
-        main: null,
-        keysContainer: null,
-        keys: [],
-    },
-    init() {
-        this.elements.main = document.createElement("main");
-        this.elements.keysContainer = document.createElement("div");
-        this.elements.main.classList.add("main");
-        this.elements.keysContainer.classList.add("keys");
-        this.elements.keysContainer.appendChild(this.createKeys());
-        this.elements.keys = this.elements.keysContainer.querySelectorAll(".key");
-        this.elements.main.appendChild(this.elements.keysContainer);
-        document.body.appendChild(this.elements.main);
-    },
+class App {
+    constructor() {
+        this.main = document.createElement("main");
+        this.main.classList.add("main");
+        document.body.appendChild(this.main);
+        this.keyboard = new Keyboard();
+        this.main.appendChild(this.keyboard.getKeys());
+        document.body.appendChild(this.main);
+    }
 
-      createKeys() {
+}
+
+class Keyboard {
+    constructor() {
+        this.keysContainer = document.createElement("div");
+        this.keysContainer.classList.add("keys");
+        this.keysContainer.appendChild(this.createKeys());
+        this.keys = this.keysContainer.querySelectorAll(".key");
+    }
+    getKeys() {
+        return this.keysContainer;
+    }
+
+    createKeys() {
         const fragment = document.createDocumentFragment();
         const keyLayout = [
             "`","1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace",
@@ -92,11 +98,10 @@ const Keyboard = {
 
         return fragment;
 
-    },
+    }
 
     }
     window.addEventListener("DOMContentLoaded", function () {
-
-        Keyboard.init();
+    new App();
     });
 
