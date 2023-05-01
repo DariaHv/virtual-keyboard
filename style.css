@@ -1,0 +1,55 @@
+  .main {
+    max-width: 1000px;
+    min-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .keys{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .key {
+    font-size: 100%;
+    margin: 0.5%;
+    height: 50px;
+    width: 5.5%;
+    box-shadow: 2px 2px 5px #490b0e;
+    transition: all 0.1s ease-out;
+  }
+  .key.active {
+    box-shadow:none;
+    background-color: rgb(83, 83, 122);
+}
+ .key:active {
+  box-shadow: none;
+  background-color: rgb(184, 167, 179);
+  border-color: darkgrey;
+ }
+  #backspace {
+    width:14.5%
+  }
+  #tab, #delete {
+    width: 6.7%;
+  }
+  #capslock, #enter {
+
+    width: 13.2%;
+  }
+  #controlright, #controlleft{
+    width: 10%;
+  }
+ #space {
+    width: 35%;
+  }
+#shiftleft{
+    width: 21%;
+  }
+.textbox {
+    width: 100%;
+    height: 100px;
+    order: 0;
+  }
+  
