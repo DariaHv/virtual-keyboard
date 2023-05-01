@@ -15,10 +15,13 @@ class App {
     constructor() {
         this.main = document.createElement("main");
         this.main.classList.add("main");
+        this.lang = document.createElement("p");
+        this.lang.id = 'language';
+        this.lang.textContent = 'English - "Alt left", Belarusian - "Alt left"';
         document.body.appendChild(this.main);
         this.textbox = new Textbox();
         this.keyboard = new Keyboard(this.textbox,this.main).getKeysContainer();
-        //this.textbox.focus();
+        this.main.appendChild(this.lang);
         this.main.appendChild(this.textbox.getTextbox());
         this.main.appendChild(this.keyboard);
         document.body.appendChild(this.main);
@@ -28,75 +31,53 @@ class App {
         this.main.addEventListener(
             "keydown",
             (event) => {
-                event.preventDefault();    
+                event.preventDefault();
            if(!event.repeat)
-              {let key = this.findKey(event.code, document.getElementsByClassName("key"));
-              if (key!=0) {
-               key.click();               
+              {let key = document.getElementById(event.code.toLowerCase());
+                if (!(key===null))  {
+               key.click();
                key.classList.toggle("active");
               }
-              else 
-              console.log(key)
             }
             },
             true
           );
-        
+
     this.main.addEventListener(
             "keyup",
             (event) => {
            if(!event.repeat)
               {
-              let key = this.findKey(event.code, document.getElementsByClassName("key"));
-              if (key!=0) {
+              let key = document.getElementById(event.code.toLowerCase());
+              if (!(key===null)) {
                 key.classList.toggle("active");
               }
-              //else 
-              console.log(key)
+
             }
             },
             true
           );
-    }  
-    
-
-
-    
-    
-    findKey(code, keys) {
-       function hasKey(value, code) {
-           const list = Array.from(value.classList); 
-           for (let i=0; i<list.length; i++)
-             {
-              if ((list[i].replace("-",""))==(code.toLowerCase()
-              ))
-              return true;
-             }
-              return false;
-            }
-          for (let i=0; i<keys.length;i++){
-            //console.log (keys[i].classList)
-            if (hasKey(keys[i], code)){
-            return keys[i];}
-          }
-          return 0;
-        }
-    
     }
-    
+
+
+
+
+    }
+
 
 
 
 class Keyboard {
-    constructor(textbox, main) {
+    constructor(main) {
         this.keysContainer = document.createElement("div");
         this.keysContainer.classList.add("keys");
         this.keysContainer.appendChild(this.createKeys());
         this.keys = this.keysContainer.querySelectorAll(".key");
         this.value = "";
         this.capsLock = false; 
-        this.textbox = textbox;
         this.main=main;
+        this.caps=false;
+        this.language = "en";
     }
     getKeysContainer() {
         return this.keysContainer;
@@ -104,155 +85,232 @@ class Keyboard {
     getKeys() {
         return this.keys;
     }
-   /* _triggerEvent(handlerName) {
-        if (typeof this.eventHandlers[handlerName] == "function") {
-            this.eventHandlers[handlerName](this.value);
+
+    getCaretPosition() {
+        let ctrl= document.getElementById("textbox");
+        // IE < 9 Support 
+        if (document.selection) {
+            var range = document.selection.createRange();
+            var rangelen = range.text.length;
+            range.moveStart('character', -ctrl.value.length);
+            var start = range.text.length - rangelen;
+            return {
+                'start': start,
+                'end': start + rangelen
+            };
+        } // IE >=9 and other browsers
+        else if (ctrl.selectionStart || ctrl.selectionStart == '0') {
+            return {
+                'start': ctrl.selectionStart,
+                'end': ctrl.selectionEnd
+            };
+        } else {
+            return {
+                'start': 0,
+                'end': 0
+            };
         }
-    }*/
-    keySend(ev) {
-        console.log ("keySend start!");
+    }
+    
+ setCaretPosition(start, end) {
+        let ctrl= document.getElementById("textbox");
+        // IE >= 9 and other browsers
+        if (ctrl.setSelectionRange) {
+            ctrl.focus();
+            ctrl.setSelectionRange(start, end);
+        }
+        // IE < 9 
+        else if (ctrl.createTextRange) {
+            var range = ctrl.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    }
+
+      printKey(key) {
+        let position=this.getCaretPosition().start;
         let textbox=document.getElementById("textbox");
+        if (this.language=="en")
+        textbox.value=textbox.value.replace(textbox.value.slice(0,position),textbox.value.slice(0,position)+(this.caps?key[1]:key[0]));
+        else 
+        textbox.value=textbox.value.replace(textbox.value.slice(0,position),textbox.value.slice(0,position)+(this.caps?key[3]:key[2]));
         textbox.focus();
-        //var ke = new KeyboardEvent("keydown", {key: "w", keyCode: 87, ctrlKey: true, cancelable: true, bubbles: true});"KeyU"
-        var ke = new KeyboardEvent(ev, {key: "u", code:"KeyU", ctrlKey: true, cancelable: true, bubbles: true});
-        this.main.dispatchEvent(ke);
-        console.log ("keySend start!");
-        textbox.focus();
-      }
+        let newPosition=position+1;
+        this.setCaretPosition(newPosition,newPosition);
+    }
     createKeys() {
         const fragment = document.createDocumentFragment();
-        const keyLayout = [
-            "`","1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace",
-            "Tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\", "DEL",
-            "CapsLock", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "\"","ENTER",
-            "Shift ", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", "↑", "Shift",
-            "Ctrl ","Win", "Alt "," ", "Alt","Ctrl", "←", "↓", "→"
-        ];
+        const keyLayout = {
+            backquote:["`","~","ё","Ё"],
+            digit1:["1","!","1","!"], 
+            digit2:["2","@","2","\""], 
+            digit3:["3","#","3","№"],
+            digit4:["4","$","4",";"], 
+            digit5:["5","%","5","%"],
+            digit6:["6","^","6",":"],
+            digit7:["7","&","7","?"],
+            digit8:["8","*","8","*"],
+            digit9:["9","(","9","("],
+            digit0:["0",")","0",")"], 
+            minus:["-","_","-","_"], 
+            equal:["=","+","=","+"],
+            backspace:["Backspace"],
+            tab:["\t","\t","\t","\t"],
+            keyQ:["q","Q","й","Й"], 
+            keyW:["w","W","ц","Ц"],
+            keyE:["e","E","у","У"],
+            keyR:["r","R","к","К"],
+            keyT:["t","T","е","Е"],
+            keyY:["y","Y","н","Н"],
+            keyU:["u","U","г","Г"],
+            keyI:["i","I","ш","Ш"],
+            keyO:["o","O","ў","Ў"],
+            keyP:["p","P","е","Е"],
+            bracketLeft:["[","{","х","Х"],
+            bracketRight:["]","}","'","'"],
+            backslash:["\\","|","\\","/"],
+            delete:["DEL"],
+            capsLock:["CapsLock"],
+            keyA:["a","A","ф","Ф"],
+            keyS:["s","S","ы","Ы"],
+            keyD:["d","D","в","В"],
+            keyF:["f","F","а","А"],
+            keyG:["g","G","п","П"],
+            keyH:["h","H","р","Р"],
+            keyJ:["j","J","о","О"],
+            keyK:["k","K","л","Л"],
+            keyL:["l","L","д","Д"],
+            semicolon:[";",":","ж","Ж"],
+            quote:["'","\"","э","Э"],
+            enter:["\n","\n","\n","\n"],
+            shiftLeft:["Shift"],
+            keyZ:["z","Z","я","Я"],
+            keyX:["x","X","ч","Ч"],
+            keyC:["c","C","с","С"],
+            keyV:["v","V","м","М"],
+            keyB:["b","B","і","І"],
+            keyN:["n","N","т","Т"],
+            keyM:["m","M","Ь","Ь"],
+            comma:[",","<","б","Б"],
+            period:[".",">","ю","Ю"],
+            slash:["/","?",".",","],
+            arrowUp:["↑","↑","↑","↑"],
+            shiftRight:["Shift"],
+            controlLeft:["Ctrl"],
+            metaLeft:["Win"],
+            altLeft:["Alt"],
+            space:[" "],
+            altRight:["Alt"],
+            controlRight:["Ctrl"],
+            arrowLeft:["←","←","←","←"],
+            arrowDown:["↓","↓","↓","↓"],
+            arrowRight:["→","→","→","→"],
 
-        keyLayout.forEach(key => {
+        };
+        let codes = Object.keys(keyLayout)
+        console.log(keyLayout.backquote[1])
+        console.log(keyLayout.backquote[1])
+        codes.forEach(key => {
             const keyElement = document.createElement("button");
             keyElement.setAttribute("type", "button");
             keyElement.classList.add("key");
-            keyElement.textContent = key;
+            keyElement.textContent = keyLayout[key][0];
+            keyElement.setAttribute("id",key.toLowerCase());
 
             switch (key) {
-                
-                case "`":
-                    keyElement.classList.add("backquote");
-                    break;
 
-                case "-":
-                    keyElement.classList.add("minus");
-                    break;
-
-                case "=":
-                    keyElement.classList.add("equal");
-                    break;
-
-                case "Backspace":
+                case "backspace":
                     keyElement.classList.add("backspace");
                     keyElement.addEventListener("click", () => {
+                        let position=this.getCaretPosition().start;
+                        let textbox=document.getElementById("textbox");
+                        textbox.value=textbox.value.replace(textbox.value.slice(0,position),textbox.value.slice(0,position).slice(0,-1));
+                        textbox.focus();
+                        let newPosition=position-1;
+                        this.setCaretPosition(newPosition,newPosition);
                        
                     });
 
                     break;
 
-                case "Tab":
-                    keyElement.classList.add("tab");
 
+                case "capsLock":
+                keyElement.addEventListener("click", () => {
+                   this.caps=!this.caps;
+                });
                     break;
 
-                case "[":
-                    keyElement.classList.add("bracket-left");
-
+                case "delete":
+                keyElement.addEventListener("click", () => {
+                    let position=this.getCaretPosition().start;
+                    let textbox=document.getElementById("textbox");
+                    textbox.value=textbox.value.replace(textbox.value.slice(position),textbox.value.slice(position).slice(1));
+                    textbox.focus();
+                    this.setCaretPosition(position,position);
+                   
+                });
                     break;
 
-                case "]":
-                    keyElement.classList.add("bracket-right");
-
+                case "shiftRight":
+                    keyElement.classList.add("shift");
+                    keyElement.addEventListener("mousedown", () => {
+                       this.caps=!this.caps;
+                    });
+                    keyElement.addEventListener("mouseup", () => {
+                       this.caps=!this.caps;
+                    });
                     break;
 
-                case "\\":
-                    keyElement.classList.add("backslash");
-
+                case "shiftLeft":
+                    keyElement.classList.add("shift");
+                    keyElement.addEventListener("mousedown", () => {
+                       this.caps=!this.caps;
+                    });
+                    keyElement.addEventListener("mouseup", () => {
+                       this.caps=!this.caps;
+                    });
                     break;
 
-                case "CapsLock":
-                    keyElement.classList.add("capslock");
-                    break;
 
-                case "DEL":
-                    keyElement.classList.add("delete");
-                    break;
 
-                case ";":
-                    keyElement.classList.add("semicolon");
-                    break;
-
-                case "\"":
-                    keyElement.classList.add("quote");
-                    break;
-
-                case "ENTER":
-                    keyElement.classList.add("enter");
-
-                    break;
-
-                case "Shift ":
-                    keyElement.classList.add("shift-left");
-
-                    break;
-
-                case ",":
-                    keyElement.classList.add("comma");
-
-                    break;
-
-                case ".":
-                    keyElement.classList.add("period");
-
-                    break;
-
-                case "/":
-                    keyElement.classList.add("slash");
-
-                    break;
-
-                case "Shift":
-                    keyElement.classList.add("shift-right");
-
-                    break;
-
-                case "Ctrl ":
+                case "controlRight":
                     keyElement.classList.add("ctrl");
-                    keyElement.classList.add("control-left");
                     break;
 
-                case "Ctrl":
+
+
+                case "controlLeft":
                     keyElement.classList.add("ctrl");
-                    keyElement.classList.add("control-right");
                     break;
 
-                case "Win":
-                    keyElement.classList.add("meta-left");
-
+                case "metaLeft":
+                    keyElement.addEventListener("click", () => {
+                });
                     break;
 
-                case "Alt ":
+                
+                case "altRight":
                     keyElement.classList.add("alt");
-                    keyElement.classList.add("alt-left");
+                    keyElement.addEventListener("click", () => {
+                    this.language="blr";
+                    let lang=document.getElementById("language");
+                    lang.textContent = 'Англійская - "Alt left", Беларуская - "Alt left"'
 
+                    });
+    
                     break;
 
-                case "Alt":
+                    case "altLeft":
                     keyElement.classList.add("alt");
-                    keyElement.classList.add("alt-right");
+                    keyElement.addEventListener("click", () => {
+                    this.language="en";
+                    let lang=document.getElementById("language");                       
+                    lang.textContent = 'English - "Alt left", Belarusian - "Alt left"'
+                    });
     
                         break;
-
-                case " ":
-                    keyElement.classList.add("space");
-                    break;
 
                 case "↑":
                     keyElement.classList.add("arrow");
@@ -276,26 +334,21 @@ class Keyboard {
                     break;
 
                 default:
-                    if (!isNaN(key))
-                      {keyElement.classList.add("digit-"+key);}
-                      else {keyElement.classList.add("key-"+key);}
-                      keyElement.addEventListener("click", () => {
-                        //this. value += this.capsLock ? key.toUpperCase() : key.toLowerCase();
-                        //this._triggerEvent("oninput");
-                        console.log("klick "+ key);
-                        //this.keySend("keydown");
-                        let textbox=document.getElementById("textbox");
-                        textbox.value=textbox.value+key;
-                        textbox.focus();
+                    if (key==("enter"))
+                      {
+                        keyElement.textContent = "Enter";
+                      }
+                    else if(key==("tab"))
+                      {
+                        keyElement.textContent = "Tab";
+                      }
+                    keyElement.addEventListener("click", () => {this.printKey(keyLayout[key])
+                    console.log(this.getCaretPosition()); 
                     });
-                   // keyElement.addEventListener("mouseup", () => {
-                        //this. value += this.capsLock ? key.toUpperCase() : key.toLowerCase();
-                        //this._triggerEvent("oninput");
-                  //      console.log("klick "+ key);
-                        //this.keySend("keyup");
-                    //});
                 break;
             }
+
+
 
             fragment.appendChild(keyElement);
 
@@ -309,5 +362,4 @@ class Keyboard {
     window.addEventListener("DOMContentLoaded", function () {
     new App();
     });
-    
 
