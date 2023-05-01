@@ -2,6 +2,7 @@ class Textbox {
     constructor() {
         this.textbox = document.createElement("textarea");
         this.textbox.classList.add("textbox");
+        this.textbox.setAttribute("id", "textbox");
     }
 
     getTextbox() {
@@ -15,19 +16,23 @@ class App {
         this.main = document.createElement("main");
         this.main.classList.add("main");
         document.body.appendChild(this.main);
-        this.keyboard = new Keyboard().getKeysContainer();
         this.textbox = new Textbox();
+        this.keyboard = new Keyboard(this.textbox,this.main).getKeysContainer();
+        //this.textbox.focus();
         this.main.appendChild(this.textbox.getTextbox());
         this.main.appendChild(this.keyboard);
         document.body.appendChild(this.main);
+        setTimeout(function() {
+            document.getElementById("textbox").focus();
+        }, 0);
         this.main.addEventListener(
             "keydown",
             (event) => {
+                event.preventDefault();    
            if(!event.repeat)
               {let key = this.findKey(event.code, document.getElementsByClassName("key"));
               if (key!=0) {
-  
-               
+               key.click();               
                key.classList.toggle("active");
               }
               else 
@@ -46,7 +51,7 @@ class App {
               if (key!=0) {
                 key.classList.toggle("active");
               }
-              else 
+              //else 
               console.log(key)
             }
             },
@@ -83,13 +88,15 @@ class App {
 
 
 class Keyboard {
-    constructor() {
+    constructor(textbox, main) {
         this.keysContainer = document.createElement("div");
         this.keysContainer.classList.add("keys");
         this.keysContainer.appendChild(this.createKeys());
         this.keys = this.keysContainer.querySelectorAll(".key");
         this.value = "";
-        this.capsLock = false;
+        this.capsLock = false; 
+        this.textbox = textbox;
+        this.main=main;
     }
     getKeysContainer() {
         return this.keysContainer;
@@ -97,7 +104,21 @@ class Keyboard {
     getKeys() {
         return this.keys;
     }
-
+   /* _triggerEvent(handlerName) {
+        if (typeof this.eventHandlers[handlerName] == "function") {
+            this.eventHandlers[handlerName](this.value);
+        }
+    }*/
+    keySend(ev) {
+        console.log ("keySend start!");
+        let textbox=document.getElementById("textbox");
+        textbox.focus();
+        //var ke = new KeyboardEvent("keydown", {key: "w", keyCode: 87, ctrlKey: true, cancelable: true, bubbles: true});"KeyU"
+        var ke = new KeyboardEvent(ev, {key: "u", code:"KeyU", ctrlKey: true, cancelable: true, bubbles: true});
+        this.main.dispatchEvent(ke);
+        console.log ("keySend start!");
+        textbox.focus();
+      }
     createKeys() {
         const fragment = document.createDocumentFragment();
         const keyLayout = [
@@ -130,6 +151,9 @@ class Keyboard {
 
                 case "Backspace":
                     keyElement.classList.add("backspace");
+                    keyElement.addEventListener("click", () => {
+                       
+                    });
 
                     break;
 
@@ -253,11 +277,23 @@ class Keyboard {
 
                 default:
                     if (!isNaN(key))
-                      keyElement.classList.add("digit-"+key);
-                      else keyElement.classList.add("key-"+key);
-                     
-
-                    //keyElement.classList.add(key);
+                      {keyElement.classList.add("digit-"+key);}
+                      else {keyElement.classList.add("key-"+key);}
+                      keyElement.addEventListener("click", () => {
+                        //this. value += this.capsLock ? key.toUpperCase() : key.toLowerCase();
+                        //this._triggerEvent("oninput");
+                        console.log("klick "+ key);
+                        //this.keySend("keydown");
+                        let textbox=document.getElementById("textbox");
+                        textbox.value=textbox.value+key;
+                        textbox.focus();
+                    });
+                   // keyElement.addEventListener("mouseup", () => {
+                        //this. value += this.capsLock ? key.toUpperCase() : key.toLowerCase();
+                        //this._triggerEvent("oninput");
+                  //      console.log("klick "+ key);
+                        //this.keySend("keyup");
+                    //});
                 break;
             }
 

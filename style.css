@@ -18,9 +18,14 @@
     width: 5.5%;
   }
   .key.active {
-    box-shadow: 2px 2px 5px #fc894d;
-    background-color: blue;
+    box-shadow: 2px 2px 5px #cc383f;
+    background-color: rgb(83, 83, 122);
 }
+ .key:active {
+  box-shadow: none;
+  background-color: rgb(233, 227, 227);
+  border-color: darkgrey;
+ }
   .backspace {
     width:14.5%
   }
