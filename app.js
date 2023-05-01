@@ -17,7 +17,7 @@ class App {
         this.main.classList.add("main");
         this.lang = document.createElement("p");
         this.lang.id = 'language';
-        this.lang.textContent = 'English - "Alt left", Belarusian - "Alt left"';
+        this.lang.textContent = 'English - "Alt left", Belarusian - "Alt right"';
         document.body.appendChild(this.main);
         this.textbox = new Textbox();
         this.keyboard = new Keyboard(this.textbox,this.main).getKeysContainer();
@@ -296,7 +296,7 @@ class Keyboard {
                     keyElement.addEventListener("click", () => {
                     this.language="blr";
                     let lang=document.getElementById("language");
-                    lang.textContent = 'Англійская - "Alt left", Беларуская - "Alt left"'
+                    lang.textContent = 'Англійская - "Alt left", Беларуская - "Alt right"'
 
                     });
     
@@ -307,7 +307,7 @@ class Keyboard {
                     keyElement.addEventListener("click", () => {
                     this.language="en";
                     let lang=document.getElementById("language");                       
-                    lang.textContent = 'English - "Alt left", Belarusian - "Alt left"'
+                    lang.textContent = 'English - "Alt left", Belarusian - "Alt right"'
                     });
     
                         break;
